@@ -1,0 +1,62 @@
+﻿@using ContractsTracking.Utility.Models;
+@model IEnumerable<Contract>
+@{
+    ViewData["Title"] = "Search";
+    ViewData["contactNumber"] = "";
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <form asp-controller="Home" asp-action="Search">
+            <p>
+                Contract Number: <input type="text" name="contractNumber" value="@ViewData["contractNumber"]" />
+                <br />
+                <input type="submit" onclick="location.href = '@Url.Action("Search","Home", new { contractNumber = @ViewData["contractNumber"] })'"/>
+            </p>
+        </form>
+    </div>
+    @if (ViewData["Data"].Equals(true))
+    {
+        <div>
+            <div id="searchresults">
+                <table class="table table-sm table-striped table-hover border-bottom">
+                    <thead>
+                        <tr>
+                            <th class="d-none d-lg-table-cell">
+                                Contract Number
+                            </th>
+                            <th>
+                                Customer Name
+                            </th>
+                            <th>
+                                Status
+                            </th>
+                            <th>
+                                Dealer Name
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                        <tr onclick="location.href = '@Url.Action("Contract","Home", new { contractID = item.contractNumber })'">
+                            <td class="d-none d-lg-table-cell">
+                                @item.contractNumber
+                            </td>
+                            <td>
+                                @item.customerName
+                            </td>
+                            <td>
+                                @item.status
+                            </td>
+                            <td>
+                                @item.dealerName
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

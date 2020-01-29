@@ -1,0 +1,21 @@
+﻿@using ContractsTracking.Utility.Models;
+@model IEnumerable<Contract>
+@{
+    ViewData["Title"] = "Contract";
+}
+
+<h3>@ViewData["Data"]</h3>
+
+@foreach (Contract contract in Model)
+{
+<div>
+    <ul>
+        <li>Customer Name: @contract.customerName</li>
+        <li>Status: @contract.status</li>
+        <li>Dealer Name: @contract.dealerName</li>
+        <li>Dealer Number: @contract.dealerNumber</li>
+        <li>Dealer Notes: @contract.dealerNotes</li>
+        <li>Amount Financed: @contract.amountFinanced</li>
+    </ul>
+</div>
+}

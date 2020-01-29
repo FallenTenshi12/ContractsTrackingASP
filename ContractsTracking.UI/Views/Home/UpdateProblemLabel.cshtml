@@ -1,0 +1,46 @@
+﻿@using ContractsTracking.Utility.Models
+@model Problem
+@{
+}
+
+@using (Html.BeginForm())
+{
+<div class="panel">
+    <div class="panel-heading">
+        <p>Please enter the correct data:</p>
+    </div>
+    <div class="panel-body">
+        <form method="post">
+            Problem Name: @Model.problemName
+            <input type="hidden" name="problemName" value="@Model.problemName" />
+            <br />
+            <input type="text" name="defaultGroup" value="@Model.defaultGroup" />
+            <br />
+            <input type="submit" value="Update" />
+        </form>
+        <!--
+        Problem Name: @Model.problemName
+        <br />
+        Default Group for Assignment: @Html.TextBoxFor(s => s.defaultGroup)
+        <br />
+        Location Within MOSAIC: @Html.TextBoxFor(s => s.location)
+        <br />
+        <input type="submit" value="Update" />
+
+    <p>
+        Problem Name: @Model.problemName<input type="hidden" name="contractNumber" asp-for="problemName" value="@Model.problemName" />
+    </p>
+    <p>
+        Default Group for Assignment: <input type="text" name="contractNumber" asp-for="defaultGroup" value="@Model.defaultGroup" />
+    </p>
+    <p>
+        Location Within MOSAIC: <input type="text" name="contractNumber" asp-for="location" value="@Model.location" />
+    </p>
+    <button type="submit" onclick="location.href = '@Url.Action("UpdateProblem", "Home",
+        new { problemName = Model.problemName, defaultGroup = Model.defaultGroup, location = Model.location })'">
+        Update
+    </button>
+    -->
+    </div>
+</div>
+}

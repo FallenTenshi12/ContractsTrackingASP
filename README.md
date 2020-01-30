@@ -1,5 +1,7 @@
 # ContractsTrackingASP
 
+*** Be sure to change ContractsTracking.API/Controllers/* controllers.cs's connectionString variable to use the correct Data Source (your db connection). This will be incremented out as soon as I can set up a server for the db to be housed.
+
 To Create Datebase, please run these queries in order
 ******************************************QUERY 1:
 CREATE DATABASE ContractsTracking;

@@ -1,5 +1,5 @@
 ﻿@using ContractsTracking.Utility.Models;
-@model IEnumerable<Problem>
+@model IEnumerable<ProblemLabel>
 @{
     ViewData["Title"] = "Settings";
 }
@@ -17,16 +17,13 @@
                     Problem Name
                 </th>
                 <th>
-                    Default Group to Assign
-                </th>
-                <th>
-                    Location
+                    Default Group for Assignment
                 </th>
                 <th></th> <!--This is so that the bottom border for the headers goes across the Edit/Delete buttons-->
             </tr>
         </thead>
         <tbody>
-            @foreach (Problem problem in Model)
+            @foreach (ProblemLabel problem in Model)
             {
                 <tr>
                     <td class="d-none d-lg-table-cell">
@@ -34,9 +31,6 @@
                     </td>
                     <td>
                         @problem.defaultGroup
-                    </td>
-                    <td>
-                        @problem.location
                     </td>
                     <td>
                         <button type="button" onclick="location.href = '@Url.Action("UpdateProblemLabel","Home", new { problemID = @problem.problemName })'">Edit</button>

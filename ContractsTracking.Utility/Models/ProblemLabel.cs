@@ -9,12 +9,11 @@ using System.Threading.Tasks;
 
 namespace ContractsTracking.Utility.Models
 {
-    public class Problem
+    public class ProblemLabel
     {
         [Key]
         public string problemName { get; set; }
         public string defaultGroup { get; set; }
-        public string location { get; set; }
 
         public StringContent getJSON()
         {

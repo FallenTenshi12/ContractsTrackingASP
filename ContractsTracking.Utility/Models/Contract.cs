@@ -14,5 +14,7 @@ namespace ContractsTracking.Utility.Models
         public string dealerNumber { get; set; }
         public string dealerNotes { get; set; }
         public decimal amountFinanced { get; set; }
+        public List<PendingIssue> pendingIssues { get; set; }
+        public List<Comment> comments { get; set; }
     }
 }

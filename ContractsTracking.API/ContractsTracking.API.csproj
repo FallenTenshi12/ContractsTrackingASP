@@ -36,5 +36,9 @@
     <ProjectReference Include="..\ContractsTracking.Utility\ContractsTracking.Utility.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
 
 </Project>

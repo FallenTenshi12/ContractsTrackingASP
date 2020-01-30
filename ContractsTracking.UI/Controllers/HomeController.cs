@@ -119,12 +119,23 @@ namespace ContractsTracking.UI.Controllers
 #endregion APICalls
 
 #region UI Elements
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            List<Contract> contractList = new List<Contract>();
-            //List<User> userResults = new List<User>();
-            contractList = await GetContractData("assignedUser/goodwinn/");
-            return View(contractList);
+            return View();
+        }
+
+        public async Task<IActionResult> Dashboard(string username, string password)
+        {
+            //if (username != "" && password != "")
+            //{
+                List<Contract> contractList = new List<Contract>();
+                contractList = await GetContractData("assignedUser/goodwinn/");
+                return View(contractList);
+            //}
+            //else
+            //{
+            //    return RedirectToAction("Index");
+            //}
         }
 
         public async Task<IActionResult> Contract(string contractID)

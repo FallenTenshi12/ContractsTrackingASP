@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ContractsTracking.UI.Views.Home
 {
-    public class Index1Model : PageModel
+    public class DashboardModel : PageModel
     {
         public void OnGet()
         {

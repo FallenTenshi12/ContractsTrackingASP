@@ -12,6 +12,11 @@ using System.Text;
 
 namespace ContractsTracking.UI.Controllers
 {
+    public class ContractData
+    {
+        public Contract contract { get; set; }
+        public User user { get; set; }
+    }
     public class HomeController : Controller
     {
         readonly string baseURL = "https://localhost:44377/api/";
@@ -125,11 +130,15 @@ namespace ContractsTracking.UI.Controllers
         public async Task<IActionResult> Contract(string contractID)
         {
             ViewData["Data"] = contractID;
+            ContractData data = new ContractData();
+            User user = await GetUserData("goodwinn");
 
             List<Contract> contractList = await GetContractData("contractNumber/" + contractID);
             Contract contract = contractList[0];
-            contract.pendingIssues = await GetPendingIssues(contractID);
-            return View(contract);
+            contract.pendingIssues = await GetPendingIssues("contractNumber/" + contractID);
+            data.contract = contract;
+            data.user = user;
+            return View(data);
         }
 
         public async Task<IActionResult> Workbasket()

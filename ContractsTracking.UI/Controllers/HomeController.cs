@@ -12,10 +12,16 @@ using System.Text;
 
 namespace ContractsTracking.UI.Controllers
 {
+    public class ContractData
+    {
+        public Contract contract { get; set; }
+        public User user { get; set; }
+    }
     public class HomeController : Controller
     {
-        string baseURL = "https://localhost:44377/api/";
+        readonly string baseURL = "https://localhost:44377/api/";
 
+#region APICalls
         /// <summary>
         /// Hub for the code for the Contract Data
         /// Please use await in the call as this is an async call
@@ -42,7 +48,7 @@ namespace ContractsTracking.UI.Controllers
         /// </summary>
         /// <param name="urlExtention">This is everything in the url except the baseURL, as seen above</param>
         /// <returns>a list of users based on parameters</returns>
-        private async Task<List<User>> GetUserData(string urlExtention)
+        private async Task<User> GetUserData(string urlExtention)
         {
             List<User> userList = new List<User>();
             using (var httpClient = new HttpClient())
@@ -53,7 +59,7 @@ namespace ContractsTracking.UI.Controllers
                     userList = JsonConvert.DeserializeObject<List<User>>(apiResponse);
                 }
             }
-            return userList;
+            return userList[0];
         }
 
         /// <summary>
@@ -62,26 +68,26 @@ namespace ContractsTracking.UI.Controllers
         /// </summary>
         /// <param name="urlExtention">This is everything in the url except the baseURL, as seen above</param>
         /// <returns>a list of problem labels based on parameters</returns>
-        private async Task<List<Problem>> GetProblemData(string urlExtention)
+        private async Task<List<ProblemLabel>> GetProblemData(string urlExtention)
         {
-            List<Problem> problemList = new List<Problem>();
+            List<ProblemLabel> problemLabelList = new List<ProblemLabel>();
             using (var httpClient = new HttpClient())
             {
-                using (var response = await httpClient.GetAsync(baseURL + "Problems/" + urlExtention))
+                using (var response = await httpClient.GetAsync(baseURL + "ProblemLabels/" + urlExtention))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
-                    problemList = JsonConvert.DeserializeObject<List<Problem>>(apiResponse);
+                    problemLabelList = JsonConvert.DeserializeObject<List<ProblemLabel>>(apiResponse);
                 }
             }
-            return problemList;
+            return problemLabelList;
         }
 
-        private async Task<bool> SetProblemData(Problem problem)
+        private async Task<bool> SetProblemData(ProblemLabel problem)
         {
             bool isSuccessful = false;
             using (var httpClient = new HttpClient())
             {
-                using (var response = await httpClient.PostAsync(baseURL + "Problems/", problem.getJSON()))
+                using (var response = await httpClient.PostAsync(baseURL + "ProblemLabels/", problem.getJSON()))
                 {
                     if (response.IsSuccessStatusCode)
                     {
@@ -94,40 +100,77 @@ namespace ContractsTracking.UI.Controllers
                 }
             }
             return isSuccessful;
-            /*
-            List<Problem> problemList = new List<Problem>();
-            using (var httpClient = new HttpClient())
-            {
-                using (var response = await httpClient.GetAsync(baseURL + "Problems/" + urlExtention))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    problemList = JsonConvert.DeserializeObject<List<Problem>>(apiResponse);
-                }
-            }
-            return problemList;
-            */
         }
 
-        public async Task<IActionResult> Index()
+        private async Task<List<PendingIssue>> GetPendingIssues(string urlExtention)
         {
-            List<Contract> contractList = new List<Contract>();
-            List<User> userResults = new List<User>();
+            List<PendingIssue> pendingIssues = new List<PendingIssue>();
             using (var httpClient = new HttpClient())
             {
-                userResults = await GetUserData("steelea");
-
-                string role = userResults[0].role.Equals("Contract Admin Manager") ? " " : userResults[0].role;
-
-                contractList = await GetContractData("assignedGroup/" + role + "/");
+                string url = baseURL + "PendingIssue/" + urlExtention;
+                using (var response = await httpClient.GetAsync(url))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    pendingIssues = JsonConvert.DeserializeObject<List<PendingIssue>>(apiResponse);
+                }
             }
-            return View(contractList);
+            return pendingIssues;
+        }
+#endregion APICalls
+
+#region UI Elements
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> Dashboard(string username, string password)
+        {
+            //if (username != "" && password != "")
+            //{
+                List<Contract> contractList = new List<Contract>();
+                contractList = await GetContractData("assignedUser/goodwinn/");
+                return View(contractList);
+            //}
+            //else
+            //{
+            //    return RedirectToAction("Index");
+            //}
         }
 
         public async Task<IActionResult> Contract(string contractID)
         {
             ViewData["Data"] = contractID;
+            ContractData data = new ContractData();
+            User user = await GetUserData("goodwinn");
 
             List<Contract> contractList = await GetContractData("contractNumber/" + contractID);
+            Contract contract = contractList[0];
+            contract.pendingIssues = await GetPendingIssues("contractNumber/" + contractID);
+            data.contract = contract;
+            data.user = user;
+            return View(data);
+        }
+
+        public async Task<IActionResult> Workbasket()
+        {
+            List<Contract> contractList = new List<Contract>();
+            User user = await GetUserData("goodwinn");
+            if (user.role.Contains("Contract Admin"))
+                user.role = " ";
+            List<PendingIssue> pendingIssues = await GetPendingIssues("assignedGroup/" + user.role + "/");
+            foreach (PendingIssue issue in pendingIssues)
+            {
+                Contract tempContract = (await GetContractData("contractNumber/" + issue.ContractNumber))[0];
+                bool found = false;
+                foreach (Contract contract in contractList)
+                {
+                    if (contract.contractNumber.Equals(tempContract.contractNumber))
+                        found = true;
+                }
+                if (!found)
+                    contractList.Add(tempContract);
+            }
             return View(contractList);
         }
 
@@ -138,27 +181,24 @@ namespace ContractsTracking.UI.Controllers
 
         public async Task<IActionResult> Settings()
         {
-            List<Problem> problems = await GetProblemData("");
+            List<ProblemLabel> problems = await GetProblemData("");
             return View(problems);
         }
         
         public async Task<IActionResult> UpdateProblemLabel(string problemID)
         {
-            Problem problem = new Problem();
             problemID = problemID.Replace(" ", "%20", StringComparison.OrdinalIgnoreCase).Replace("/", "%2F", StringComparison.OrdinalIgnoreCase);
-            List<Problem> problems = await GetProblemData(problemID);
-            problem = problems[0];
-            return View(problem);
+            List<ProblemLabel> problemLabels = await GetProblemData(problemID);
+            var problemLabel = problemLabels[0];
+            return View(problemLabel);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> UpdateProblem(string problemName, string defaultGroup, string location)
+        public async Task<IActionResult> UpdateProblem(string problemName, string defaultGroup)
         {
-            Problem problem = new Problem()
+            ProblemLabel problem = new ProblemLabel()
             {
                 problemName = problemName,
-                defaultGroup = defaultGroup,
-                location = location
+                defaultGroup = defaultGroup
             };
             await SetProblemData(problem);
             //await GetProblemData("update/" + problemName + "/" + defaultGroup + "/" + location);
@@ -167,12 +207,12 @@ namespace ContractsTracking.UI.Controllers
 
         public async Task<IActionResult> Search(string contractNumber)
         {
-            List<Contract> contracts = new List<Contract>();
             if (contractNumber is null) contractNumber = new string(" /");
-            contracts = await GetContractData("contractNumber/" + contractNumber);
+            List<Contract> contracts = await GetContractData("contractNumber/" + contractNumber);
             ViewData["Data"] = (contracts.Count != 0);
             return View(contracts);
         }
+#endregion UI Elements
 
 
         public IActionResult Privacy()

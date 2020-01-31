@@ -1,21 +1,58 @@
 ﻿@using ContractsTracking.Utility.Models;
-@model IEnumerable<Contract>
+@using ContractsTracking.UI.Controllers;
+@model ContractData
 @{
     ViewData["Title"] = "Contract";
 }
 
-<h3>@ViewData["Data"]</h3>
-
-@foreach (Contract contract in Model)
-{
+<h1>@ViewData["Data"]</h1>
 <div>
     <ul>
-        <li>Customer Name: @contract.customerName</li>
-        <li>Status: @contract.status</li>
-        <li>Dealer Name: @contract.dealerName</li>
-        <li>Dealer Number: @contract.dealerNumber</li>
-        <li>Dealer Notes: @contract.dealerNotes</li>
-        <li>Amount Financed: @contract.amountFinanced</li>
+        <li>Customer Name: @Model.contract.customerName</li>
+        <li>Status: @Model.contract.status</li>
+        <li>Dealer Name: @Model.contract.dealerName</li>
+        <li>Dealer Number: @Model.contract.dealerNumber</li>
+        <li>Dealer Notes: @Model.contract.dealerNotes</li>
+        <li>Amount Financed: @Model.contract.amountFinanced</li>
     </ul>
+
+    <h3>Comments:</h3>
+    <ul>
+        <li>
+            First Comment!
+        </li>
+    </ul>
+    <textarea></textarea>
+
+    <h3>Pending Issues:</h3>
+    <table class="table table-sm table-striped table-hover border-bottom">
+        <thead>
+            <tr>
+                <th>Issue</th>
+                <th>Assigned Group</th>
+                <th>Status</th>
+                <th>Time Reported</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(PendingIssue issue in Model.contract.pendingIssues)
+            {
+            <tr>
+                <td>@issue.Name</td>
+                <td>@issue.AssignedGroup</td>
+                <td>@issue.Status</td>
+                <td>@issue.TimeReported.ToString("MM/dd/yyyy HH:mm tt")</td>
+                <td>
+                    @if (Model.user.role == issue.AssignedGroup)
+                    {
+                        <button>Edit</button> <span>|</span>
+                    }
+                    <button>Comments</button>
+                </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button>Add Pending Issue</button>
 </div>
-}

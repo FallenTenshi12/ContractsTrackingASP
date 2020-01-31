@@ -1,77 +1,71 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ContractsTracking.API.Models;
+using Microsoft.Extensions.Logging;
 using ContractsTracking.Utility.Models;
-using System.Data.SqlClient;
-using Dapper;
+using System.Data;
 
 namespace ContractsTracking.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProblemsController : ControllerBase
+    public class ProblemLabelsController : ControllerBase
     {
-        private readonly ProblemContext _context;
-        private readonly string connString = @"Data Source=DESKTOP-JTHMVU3\SQLEXPRESS; Database=ContractsTracking; Integrated Security=true";
+        Config config;
 
-        public ProblemsController(ProblemContext context)
+        public ProblemLabelsController()
         {
-            _context = context;
+            config = new Config();
         }
 
         // GET: api/Problems
         [HttpGet]
-        public ActionResult<IEnumerable<Problem>> GetProblemItems()
+        public IEnumerable<ProblemLabel> GetProblemItems()
         {
-            List<Problem> problemList = new List<Problem>();
+            List<ProblemLabel> problemLabelList = new List<ProblemLabel>();
 
-            using (SqlConnection conn = new SqlConnection(connString))
+            using (SqlConnection conn = new SqlConnection(config.connString))
             {
                 conn.Open();
-                string sqlString = "SELECT * FROM dbo.Problems";
+                string sqlString = "SELECT * FROM dbo.ProblemLabels";
                 SqlCommand cmd = new SqlCommand(sqlString, conn);
                 SqlDataReader reader = cmd.ExecuteReader();
 
                 while (reader.Read())
                 {
-                    Problem problem = new Problem();
-                    problem.problemName = reader.GetString(0);
-                    problem.defaultGroup = reader.GetString(1);
-                    problem.location = reader.GetString(2);
-                    problemList.Add(problem);
+                    ProblemLabel problemLabel = new ProblemLabel();
+                    problemLabel.problemName = reader.GetString(0);
+                    problemLabel.defaultGroup = reader.GetString(1);
+                    problemLabelList.Add(problemLabel);
                 }
 
                 reader.Close();
                 cmd.Dispose();
                 conn.Close();
             }
-            return problemList.ToArray();
+            return problemLabelList.ToArray();
         }
 
-        // GET: api/Problems/5
-        [HttpGet("{id}")]
-        public ActionResult<IEnumerable<Problem>> GetProblem(string id)
+        [HttpGet("{problemName}")]
+        public List<ProblemLabel> GetProblemItem(string problemName)
         {
-            List<Problem> problemList = new List<Problem>();
+            List<ProblemLabel> problemList = new List<ProblemLabel>();
 
-            using (SqlConnection conn = new SqlConnection(connString))
+            using (SqlConnection conn = new SqlConnection(config.connString))
             {
                 conn.Open();
-                string sqlString = "SELECT * FROM dbo.Problems WHERE problemName LIKE '%" + id + "%'";
+                string sqlString = "SELECT * FROM dbo.ProblemLabels WHERE problemName = '" + problemName + "'";
                 SqlCommand cmd = new SqlCommand(sqlString, conn);
                 SqlDataReader reader = cmd.ExecuteReader();
 
                 while (reader.Read())
                 {
-                    Problem problem = new Problem();
+                    ProblemLabel problem = new ProblemLabel();
                     problem.problemName = reader.GetString(0);
                     problem.defaultGroup = reader.GetString(1);
-                    problem.location = reader.GetString(2);
                     problemList.Add(problem);
                 }
 
@@ -86,14 +80,14 @@ namespace ContractsTracking.API.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public int PostProblem(Problem problem)
+        public int PostProblem(ProblemLabel problem)
         {
             int rowsAffected = 0;
-            using (SqlConnection conn = new SqlConnection(connString))
+            using (SqlConnection conn = new SqlConnection(config.connString))
             {
                 conn.Open();
-                string sqlString = "UPDATE dbo.Problems " +
-                                    "SET defaultGroup='" + problem.defaultGroup + "', location='" + problem.location + "' " +
+                string sqlString = "UPDATE dbo.ProblemLabels " +
+                                    "SET defaultGroup='" + problem.defaultGroup + "'" +
                                     "WHERE problemName LIKE '%" + problem.problemName + "%' ";
                 SqlCommand cmd = new SqlCommand(sqlString, conn);
                 rowsAffected = cmd.ExecuteNonQuery();
@@ -105,9 +99,10 @@ namespace ContractsTracking.API.Controllers
             return rowsAffected;
         }
 
+        /*
         // DELETE: api/Problems/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Problem>> DeleteProblem(string id)
+        public async Task<ActionResult<ProblemLabel>> DeleteProblem(string id)
         {
             var problem = await _context.ProblemItems.FindAsync(id);
             if (problem == null)
@@ -116,7 +111,7 @@ namespace ContractsTracking.API.Controllers
             }
 
             _context.ProblemItems.Remove(problem);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync().ConfigureAwait(false);
 
             return problem;
         }
@@ -125,5 +120,6 @@ namespace ContractsTracking.API.Controllers
         {
             return _context.ProblemItems.Any(e => e.problemName == id);
         }
+        */
     }
 }

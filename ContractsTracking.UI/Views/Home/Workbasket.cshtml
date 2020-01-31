@@ -1,0 +1,28 @@
+﻿@using ContractsTracking.Utility.Models;
+@model IEnumerable<Contract>
+@{
+}
+
+<div>
+    <table class="table table-sm table-striped table-hover border-bottom">
+        <thead>
+            <tr>
+                <th>Contract Number</th>
+                <th>Customer Name</th>
+                <th>Status</th>
+                <th>Dealer Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var contract in Model)
+            {
+                <tr onclick="location.href = '@Url.Action("Contract","Home", new { contractID = contract.contractNumber })'">
+                    <td>@contract.contractNumber</td>
+                    <td>@contract.customerName</td>
+                    <td>@contract.status</td>
+                    <td>@contract.dealerName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

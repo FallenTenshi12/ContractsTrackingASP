@@ -1,5 +1,6 @@
 ﻿@using ContractsTracking.Utility.Models;
-@model Contract
+@using ContractsTracking.UI.Controllers;
+@model ContractData
 @{
     ViewData["Title"] = "Contract";
 }
@@ -7,12 +8,12 @@
 <h1>@ViewData["Data"]</h1>
 <div>
     <ul>
-        <li>Customer Name: @Model.customerName</li>
-        <li>Status: @Model.status</li>
-        <li>Dealer Name: @Model.dealerName</li>
-        <li>Dealer Number: @Model.dealerNumber</li>
-        <li>Dealer Notes: @Model.dealerNotes</li>
-        <li>Amount Financed: @Model.amountFinanced</li>
+        <li>Customer Name: @Model.contract.customerName</li>
+        <li>Status: @Model.contract.status</li>
+        <li>Dealer Name: @Model.contract.dealerName</li>
+        <li>Dealer Number: @Model.contract.dealerNumber</li>
+        <li>Dealer Notes: @Model.contract.dealerNotes</li>
+        <li>Amount Financed: @Model.contract.amountFinanced</li>
     </ul>
 
     <h3>Comments:</h3>
@@ -31,19 +32,27 @@
                 <th>Assigned Group</th>
                 <th>Status</th>
                 <th>Time Reported</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach(PendingIssue issue in Model.pendingIssues)
+            @foreach(PendingIssue issue in Model.contract.pendingIssues)
             {
-                <tr>
-                    <td>@issue.Name</td>
-                    <td>@issue.AssignedGroup</td>
-                    <td>@issue.Status</td>
-                    <td>@issue.TimeReported.ToString("MM/dd/yyyy HH:mm tt")</td>
+            <tr>
+                <td>@issue.Name</td>
+                <td>@issue.AssignedGroup</td>
+                <td>@issue.Status</td>
+                <td>@issue.TimeReported.ToString("MM/dd/yyyy HH:mm tt")</td>
+                <td>
+                    @if (Model.user.role == issue.AssignedGroup)
+                    {
+                        <button>Edit</button> <span>|</span>
+                    }
+                    <button>Comments</button>
+                </td>
                 </tr>
             }
         </tbody>
     </table>
-    <textarea></textarea>
+    <button>Add Pending Issue</button>
 </div>

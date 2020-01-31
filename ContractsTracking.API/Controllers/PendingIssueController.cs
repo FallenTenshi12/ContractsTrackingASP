@@ -13,17 +13,13 @@ namespace ContractsTracking.API.Controllers
     [ApiController]
     public class PendingIssueController : ControllerBase
     {
-        Config config;
-        public PendingIssueController()
-        {
-            config = new Config();
-        }
+        private readonly string connectionString = @"Data Source=DESKTOP-JTHMVU3\SQLEXPRESS; Database=ContractsTracking; Integrated Security=true;";
 
         [HttpGet("{filterType}/{filterValue}")]
         public IEnumerable<PendingIssue> Get(string filterType, string filterValue)
         {
             List<PendingIssue> pendingIssues = new List<PendingIssue>();
-            using (SqlConnection conn = new SqlConnection(config.connString))
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
                 string sqlString = "SELECT * FROM dbo.PendingIssues WHERE " + filterType + " LIKE '%" + filterValue + "%'";

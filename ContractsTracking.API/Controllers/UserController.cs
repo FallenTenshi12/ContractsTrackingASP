@@ -13,13 +13,12 @@ namespace ContractsTracking.API.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        Config config;
+
         private readonly ILogger<UserController> _logger;
 
         public UserController(ILogger<UserController> logger)
         {
             _logger = logger;
-            config = new Config();
         }
 
         [HttpGet("{username}")]
@@ -28,7 +27,7 @@ namespace ContractsTracking.API.Controllers
             List<User> userResult = new List<User>();
             string connectionString = @"Data Source=DESKTOP-JTHMVU3\SQLEXPRESS; Database=ContractsTracking; Integrated Security=true";
 
-            using (SqlConnection conn = new SqlConnection(config.connString))
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
                 string sqlString = "SELECT * FROM dbo.Users WHERE username = '" + username + "'";

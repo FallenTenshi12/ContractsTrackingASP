@@ -14,12 +14,7 @@ namespace ContractsTracking.API.Controllers
     [ApiController]
     public class ProblemLabelsController : ControllerBase
     {
-        Config config;
-
-        public ProblemLabelsController()
-        {
-            config = new Config();
-        }
+        private readonly string connString = @"Data Source=DESKTOP-JTHMVU3\SQLEXPRESS; Database=ContractsTracking; Integrated Security=true";
 
         // GET: api/Problems
         [HttpGet]
@@ -27,7 +22,7 @@ namespace ContractsTracking.API.Controllers
         {
             List<ProblemLabel> problemLabelList = new List<ProblemLabel>();
 
-            using (SqlConnection conn = new SqlConnection(config.connString))
+            using (SqlConnection conn = new SqlConnection(connString))
             {
                 conn.Open();
                 string sqlString = "SELECT * FROM dbo.ProblemLabels";
@@ -54,7 +49,7 @@ namespace ContractsTracking.API.Controllers
         {
             List<ProblemLabel> problemList = new List<ProblemLabel>();
 
-            using (SqlConnection conn = new SqlConnection(config.connString))
+            using (SqlConnection conn = new SqlConnection(connString))
             {
                 conn.Open();
                 string sqlString = "SELECT * FROM dbo.ProblemLabels WHERE problemName = '" + problemName + "'";
@@ -83,7 +78,7 @@ namespace ContractsTracking.API.Controllers
         public int PostProblem(ProblemLabel problem)
         {
             int rowsAffected = 0;
-            using (SqlConnection conn = new SqlConnection(config.connString))
+            using (SqlConnection conn = new SqlConnection(connString))
             {
                 conn.Open();
                 string sqlString = "UPDATE dbo.ProblemLabels " +

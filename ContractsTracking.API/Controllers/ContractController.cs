@@ -15,11 +15,7 @@ namespace ContractsTracking.API.Controllers
     [Route("api/[controller]")]
     public class ContractController
     {
-        Config config;
-        public ContractController()
-        {
-            config = new Config();
-        }
+        private readonly string connectionString = @"Data Source=DESKTOP-JTHMVU3\SQLEXPRESS; Database=ContractsTracking; Integrated Security=true;";
 
         [HttpGet("{filterType}/{filterValue}")]
         public IEnumerable<Contract> Get(string filterType, string filterValue)
@@ -27,7 +23,7 @@ namespace ContractsTracking.API.Controllers
             List<Contract> contractList = new List<Contract>();
             filterValue = String.IsNullOrWhiteSpace(filterValue) ? "" : filterValue;
 
-            using (SqlConnection conn = new SqlConnection(config.connString))
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
                 string sqlString = "SELECT * FROM dbo.Contracts WHERE " + filterType + " LIKE '%" + filterValue + "%'";

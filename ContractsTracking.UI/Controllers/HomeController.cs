@@ -12,11 +12,6 @@ using System.Text;
 
 namespace ContractsTracking.UI.Controllers
 {
-    public class ContractData
-    {
-        public Contract contract { get; set; }
-        public User user { get; set; }
-    }
     public class HomeController : Controller
     {
         readonly string baseURL = "https://localhost:44377/api/";
@@ -119,37 +114,22 @@ namespace ContractsTracking.UI.Controllers
 #endregion APICalls
 
 #region UI Elements
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
-        }
-
-        public async Task<IActionResult> Dashboard(string username, string password)
-        {
-            //if (username != "" && password != "")
-            //{
-                List<Contract> contractList = new List<Contract>();
-                contractList = await GetContractData("assignedUser/goodwinn/");
-                return View(contractList);
-            //}
-            //else
-            //{
-            //    return RedirectToAction("Index");
-            //}
+            List<Contract> contractList = new List<Contract>();
+            //List<User> userResults = new List<User>();
+            contractList = await GetContractData("assignedUser/goodwinn/");
+            return View(contractList);
         }
 
         public async Task<IActionResult> Contract(string contractID)
         {
             ViewData["Data"] = contractID;
-            ContractData data = new ContractData();
-            User user = await GetUserData("goodwinn");
 
             List<Contract> contractList = await GetContractData("contractNumber/" + contractID);
             Contract contract = contractList[0];
-            contract.pendingIssues = await GetPendingIssues("contractNumber/" + contractID);
-            data.contract = contract;
-            data.user = user;
-            return View(data);
+            contract.pendingIssues = await GetPendingIssues(contractID);
+            return View(contract);
         }
 
         public async Task<IActionResult> Workbasket()

@@ -26,7 +26,6 @@ namespace ContractsTracking.API.Controllers
         public IEnumerable<User> Get(string username)
         {
             List<User> userResult = new List<User>();
-            string connectionString = @"Data Source=DESKTOP-JTHMVU3\SQLEXPRESS; Database=ContractsTracking; Integrated Security=true";
 
             using (SqlConnection conn = new SqlConnection(config.connString))
             {
@@ -37,15 +36,22 @@ namespace ContractsTracking.API.Controllers
 
                 while(reader.Read())
                 {
-                    User user = new User();
-                    user.displayName = reader.GetString(0);
-                    user.role = reader.GetString(1);
+                    User user = new User
+                    {
+                        displayName = reader.GetString(0),
+                        role = reader.GetString(1),
+                        username = reader.GetString(2)
+                    };
                     userResult.Add(user);
                 }
 
                 reader.Close();
                 cmd.Dispose();
                 conn.Close();
+            }
+            if (userResult.Count == 0)
+            {
+                return null;
             }
 
             return userResult.ToArray();

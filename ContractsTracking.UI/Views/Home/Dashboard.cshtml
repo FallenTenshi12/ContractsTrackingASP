@@ -9,7 +9,7 @@
         <thead><tr><th class="d-none d-lg-table-cell">Contract Number</th><th>Customer Name</th><th>Status</th><th>Dealer Name</th></tr></thead>
         @foreach (var contract in Model)
         {
-            <tr onclick="location.href = '@Url.Action("Contract","Home", new { contractID = contract.contractNumber })'">
+            <tr onclick="location.href = '@Html.Raw(Url.Action("Contract","Home", new { contractID = contract.contractNumber, username = ViewData["user"] }))'">
                 <td class="d-none d-lg-table-cell">@contract.contractNumber</td>
                 <td>@contract.customerName</td>
                 <td>@contract.status</td>

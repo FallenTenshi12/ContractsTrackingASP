@@ -16,7 +16,7 @@
         <tbody>
             @foreach (var contract in Model)
             {
-                <tr onclick="location.href = '@Url.Action("Contract","Home", new { contractID = contract.contractNumber })'">
+                <tr onclick="location.href = '@Html.Raw(Url.Action("Contract","Home", new { contractID = contract.contractNumber, username = "meinersj" }))'">
                     <td>@contract.contractNumber</td>
                     <td>@contract.customerName</td>
                     <td>@contract.status</td>

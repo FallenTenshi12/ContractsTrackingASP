@@ -46,7 +46,7 @@
                 <td>
                     @if (Model.user.role == issue.AssignedGroup)
                     {
-                        <button>Edit</button> <span>|</span>
+                        <button onclick="location.href = '@Html.Raw(Url.Action("UpdatePendingIssueView","Home", new { problemName = issue.Name, contractNumber = Model.contract.contractNumber }))'">Edit</button> <span>|</span>
                     }
                     <button>Comments</button>
                 </td>
@@ -54,5 +54,5 @@
             }
         </tbody>
     </table>
-    <button>Add Pending Issue</button>
+    <button onclick="location.href = '@Url.Action("AddPendingIssueView","Home", new { contractNumber = Model.contract.contractNumber })'">Add Pending Issue</button>
 </div>

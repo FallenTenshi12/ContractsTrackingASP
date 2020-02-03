@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ContractsTracking.Utility.Models
@@ -14,5 +17,12 @@ namespace ContractsTracking.Utility.Models
         public string AssignedGroup { get; set; }
         public string Status { get; set; }
         public DateTime TimeReported { get; set; }
+
+        public StringContent getJSON()
+        {
+            string contents = JsonConvert.SerializeObject(this);
+            var stringContent = new StringContent(contents, Encoding.UTF8, "application/json");
+            return stringContent;
+        }
     }
 }

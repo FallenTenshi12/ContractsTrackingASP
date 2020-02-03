@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using ContractsTracking.Utility.Models;
 using System.Web;
 using System.Text;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ContractsTracking.UI.Controllers
 {
@@ -116,6 +117,34 @@ namespace ContractsTracking.UI.Controllers
             }
             return pendingIssues;
         }
+
+        private async Task<bool> AddPendingIssue(PendingIssue issue)
+        {
+            bool isSuccessful = false;
+            using (var httpClient = new HttpClient())
+            {
+                using (var response = await httpClient.PostAsync(baseURL + "PendingIssue/", issue.getJSON()))
+                {
+                    if (response.IsSuccessStatusCode)
+                        isSuccessful = true;
+                }
+            }
+            return isSuccessful;
+        }
+
+        private async Task<bool> UpdatePendingIssue(PendingIssue issue)
+        {
+            bool isSuccessful = false;
+            using (var httpClient = new HttpClient())
+            {
+                using (var response = await httpClient.PostAsync(baseURL + "PendingIssue/update", issue.getJSON()))
+                {
+                    if (response.IsSuccessStatusCode)
+                        isSuccessful = true;
+                }
+            }
+            return isSuccessful;
+        }
 #endregion APICalls
 
 #region UI Elements
@@ -126,23 +155,29 @@ namespace ContractsTracking.UI.Controllers
 
         public async Task<IActionResult> Dashboard(string username, string password)
         {
-            //if (username != "" && password != "")
-            //{
+            if (!(username is null) && !(password is null))
+            {
+                User user = await GetUserData(username);
+                if (user is null)
+                {
+                    return RedirectToAction("Index");
+                }
                 List<Contract> contractList = new List<Contract>();
-                contractList = await GetContractData("assignedUser/goodwinn/");
+                contractList = await GetContractData("assignedUser/" + user.username + "/");
+                ViewData["user"] = user.username;
                 return View(contractList);
-            //}
-            //else
-            //{
-            //    return RedirectToAction("Index");
-            //}
+            }
+            else
+            {
+                return RedirectToAction("Index");
+            }
         }
 
-        public async Task<IActionResult> Contract(string contractID)
+        public async Task<IActionResult> Contract(string contractID, string username)
         {
             ViewData["Data"] = contractID;
             ContractData data = new ContractData();
-            User user = await GetUserData("goodwinn");
+            User user = await GetUserData(username);
 
             List<Contract> contractList = await GetContractData("contractNumber/" + contractID);
             Contract contract = contractList[0];
@@ -152,10 +187,63 @@ namespace ContractsTracking.UI.Controllers
             return View(data);
         }
 
+        public async Task<IActionResult> AddPendingIssueView(string contractNumber)
+        {
+            List<ProblemLabel> problems = await GetProblemData("");
+            List<SelectListItem> items = new List<SelectListItem>();
+            foreach (ProblemLabel label in problems)
+            {
+                items.Add(new SelectListItem { Value = label.problemName, Text = label.problemName });
+            }
+            ViewData["contractNum"] = contractNumber;
+            return View(items);
+        }
+
+        public async Task<IActionResult> AddPendingIssue(string problemName, string contractNumber)
+        {
+            ProblemLabel issue = (await GetProblemData(problemName))[0];
+            PendingIssue newIssue = new PendingIssue()
+            {
+                ContractNumber = contractNumber,
+                Name = problemName,
+                AssignedGroup = issue.defaultGroup,
+                Status = "New",
+                TimeReported = DateTime.Now
+            };
+            await AddPendingIssue(newIssue);
+            return RedirectToAction("Contract", new { contractID = contractNumber });
+        }
+
+        public async Task<IActionResult> UpdatePendingIssueView(string problemName, string contractNumber)
+        {
+            List<PendingIssue> issues = await GetPendingIssues("contractNumber/" + contractNumber);
+            PendingIssue issue = new PendingIssue();
+            foreach (PendingIssue tmp in issues)
+            {
+                if (tmp.Name.Equals(problemName))
+                {
+                    issue = tmp;
+                }
+            }
+
+            return View(issue);
+        }
+
+        public async Task<IActionResult> UpdatePendingIssue(string name, string contractNumber, string status)
+        {
+            PendingIssue issue = new PendingIssue() {
+                Name = name,
+                ContractNumber = contractNumber,
+                Status = status
+            };
+            await UpdatePendingIssue(issue);
+            return RedirectToAction("Contract", new { contractID = contractNumber, username = "goodwinn" });
+        }
+
         public async Task<IActionResult> Workbasket()
         {
             List<Contract> contractList = new List<Contract>();
-            User user = await GetUserData("goodwinn");
+            User user = await GetUserData("meinersj");
             if (user.role.Contains("Contract Admin"))
                 user.role = " ";
             List<PendingIssue> pendingIssues = await GetPendingIssues("assignedGroup/" + user.role + "/");
@@ -187,7 +275,7 @@ namespace ContractsTracking.UI.Controllers
         
         public async Task<IActionResult> UpdateProblemLabel(string problemID)
         {
-            problemID = problemID.Replace(" ", "%20", StringComparison.OrdinalIgnoreCase).Replace("/", "%2F", StringComparison.OrdinalIgnoreCase);
+            problemID = HttpUtility.UrlEncode(problemID);
             List<ProblemLabel> problemLabels = await GetProblemData(problemID);
             var problemLabel = problemLabels[0];
             return View(problemLabel);

@@ -52,20 +52,44 @@ namespace ContractsTracking.API.Controllers
 
         // POST: api/PendingIssue
         [HttpPost]
-        public void Post([FromBody] string value)
+        public int Add(PendingIssue issue)
         {
+            int rowsAffected = 0;
+            using (SqlConnection conn = new SqlConnection(config.connString))
+            {
+                conn.Open();
+                string sqlString = "INSERT INTO dbo.PendingIssues (contractNumber, name, assignedGroup, status, timeReported) VALUES " +
+                                        "('"+issue.ContractNumber+"','"+issue.Name+"','"+issue.AssignedGroup+"','"+issue.Status+"','"+issue.TimeReported+"')";
+
+                SqlCommand cmd = new SqlCommand(sqlString, conn);
+                rowsAffected = cmd.ExecuteNonQuery();
+
+
+                cmd.Dispose();
+                conn.Close();
+            }
+            return rowsAffected;
         }
 
-        // PUT: api/PendingIssue/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPost("update")]
+        public int Update(PendingIssue issue)
         {
-        }
+            int rowsAffected = 0;
+            using (SqlConnection conn = new SqlConnection(config.connString))
+            {
+                conn.Open();
+                string sqlString = "UPDATE dbo.PendingIssues " +
+                                    "SET status='" + issue.Status + "' " +
+                                    "WHERE name LIKE '%" + issue.Name + "%' AND contractNumber LIKE '%" + issue.ContractNumber + "%'";
 
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+                SqlCommand cmd = new SqlCommand(sqlString, conn);
+                rowsAffected = cmd.ExecuteNonQuery();
+
+
+                cmd.Dispose();
+                conn.Close();
+            }
+            return rowsAffected;
         }
     }
 }

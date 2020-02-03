@@ -6,24 +6,19 @@
 }
 
 <div>
-    <form>
-        username:<input type="text" id="username" />
-        <br />
-        password:<input type="text" id="password" />
-        <br />
-        <input type="submit" value="Submit" href="@Url.Action("Dashboard","Home")" onclick="navigate(this.href)"/>
-    </form>
+    username:<input type="text" id="username" />
+    <br />
+    password:<input type="password" id="password" />
+    <br />
+    <input type="submit" value="Submit" onclick="navigate()"/>
 </div>
 
 <script type="text/javascript">
-    function navigate(target) {
+    function navigate() {
         var username = document.getElementById('username').value;
         var password = document.getElementById('password').value;
-        $.ajax({
-            url: '@Url.Action("Dashboard","Home")',
-            data: { username: username, password: password }
-        }).done(function () {
-            alert('added');
-        });
+        var url = '@Html.Raw(Url.Action("Dashboard","Home", new { username = "_username", password = "_password" }))';
+        url = url.replace("_username", username).replace("_password", password);
+        window.location.href = url;
     }
 </script>

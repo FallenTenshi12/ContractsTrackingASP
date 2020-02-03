@@ -1,0 +1,25 @@
+﻿@using ContractsTracking.Utility.Models;
+@model PendingIssue
+
+<div>
+    <h3>@Model.Name</h3>
+    <select id="dropdown">
+        <option>New</option>
+        <option>In Progress</option>
+        <option>Resolved</option>
+    </select>
+
+    <input type="submit" value="Submit" onclick="navigate()" />
+</div>
+
+<script type="text/javascript">
+    function navigate() {
+        var dropdown = document.getElementById('dropdown');
+        var selectedItem = dropdown.options[dropdown.selectedIndex].value;
+        alert(selectedItem);
+
+        var url = '@Html.Raw(Url.Action("UpdatePendingIssue","Home", new { name = Model.Name, contractNumber = Model.ContractNumber, status = "_status" }))';
+        url = url.replace("_status", selectedItem);
+        window.location.href = url;
+    }
+</script>

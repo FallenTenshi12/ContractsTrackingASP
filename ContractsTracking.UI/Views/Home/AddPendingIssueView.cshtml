@@ -1,0 +1,24 @@
+﻿@using  ContractsTracking.Utility.Models;
+@model IEnumerable<SelectListItem>
+@{
+}
+
+    <div>
+        <input type="hidden" />
+        <br /><br /><br /><br /><br /><br />
+        <select id="problemList" asp-items="Model"></select>
+        <br />
+        <input type="submit" value="Add Pending Issue" onclick="navigate()" />
+    </div>
+
+<script type="text/javascript">
+    function navigate() {
+        var dropdown = document.getElementById('problemList');
+        var selectedItem = dropdown.options[dropdown.selectedIndex].value;
+
+        var url = '@Html.Raw(Url.Action("AddPendingIssue","Home", new { problemName = "_problemName", contractNumber = "_contractNumber" }))';
+        url = url.replace("_problemName", selectedItem).replace("_contractNumber", '@ViewData["contractNum"]');
+        window.location.href = url;
+
+    }
+</script>

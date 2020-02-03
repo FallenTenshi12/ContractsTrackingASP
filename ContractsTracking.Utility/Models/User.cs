@@ -9,5 +9,6 @@ namespace ContractsTracking.Utility.Models
     {
         public string displayName { get; set; }
         public string role { get; set; }
+        public string username { get; set; }
     }
 }

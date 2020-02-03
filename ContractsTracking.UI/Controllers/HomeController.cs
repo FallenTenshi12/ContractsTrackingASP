@@ -15,9 +15,10 @@ namespace ContractsTracking.UI.Controllers
 {
     public class ContractData
     {
-        public Contract contract { get; set; }
-        public User user { get; set; }
+        public Contract Contract { get; set; }
+        public User User { get; set; }
     }
+
     public class HomeController : Controller
     {
         readonly string baseURL = "https://localhost:44377/api/";
@@ -34,11 +35,9 @@ namespace ContractsTracking.UI.Controllers
             List<Contract> contractList = new List<Contract>();
             using (var httpClient = new HttpClient())
             {
-                using (var response = await httpClient.GetAsync(baseURL + "contract/" + urlExtention))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    contractList = JsonConvert.DeserializeObject<List<Contract>>(apiResponse);
-                }
+                using var response = await httpClient.GetAsync(baseURL + "contract/" + urlExtention);
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                contractList = JsonConvert.DeserializeObject<List<Contract>>(apiResponse);
             }
             return contractList;
         }
@@ -54,11 +53,9 @@ namespace ContractsTracking.UI.Controllers
             List<User> userList = new List<User>();
             using (var httpClient = new HttpClient())
             {
-                using (var response = await httpClient.GetAsync(baseURL + "user/" + urlExtention))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    userList = JsonConvert.DeserializeObject<List<User>>(apiResponse);
-                }
+                using var response = await httpClient.GetAsync(baseURL + "user/" + urlExtention);
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                userList = JsonConvert.DeserializeObject<List<User>>(apiResponse);
             }
             return userList[0];
         }
@@ -74,11 +71,9 @@ namespace ContractsTracking.UI.Controllers
             List<ProblemLabel> problemLabelList = new List<ProblemLabel>();
             using (var httpClient = new HttpClient())
             {
-                using (var response = await httpClient.GetAsync(baseURL + "ProblemLabels/" + urlExtention))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    problemLabelList = JsonConvert.DeserializeObject<List<ProblemLabel>>(apiResponse);
-                }
+                using var response = await httpClient.GetAsync(baseURL + "ProblemLabels/" + urlExtention);
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                problemLabelList = JsonConvert.DeserializeObject<List<ProblemLabel>>(apiResponse);
             }
             return problemLabelList;
         }
@@ -88,16 +83,14 @@ namespace ContractsTracking.UI.Controllers
             bool isSuccessful = false;
             using (var httpClient = new HttpClient())
             {
-                using (var response = await httpClient.PostAsync(baseURL + "ProblemLabels/", problem.getJSON()))
+                using var response = await httpClient.PostAsync(baseURL + "ProblemLabels/", problem.getJSON());
+                if (response.IsSuccessStatusCode)
                 {
-                    if (response.IsSuccessStatusCode)
-                    {
-                        isSuccessful = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine(response.StatusCode + ": " + response.ReasonPhrase);
-                    }
+                    isSuccessful = true;
+                }
+                else
+                {
+                    Console.WriteLine(response.StatusCode + ": " + response.ReasonPhrase);
                 }
             }
             return isSuccessful;
@@ -109,11 +102,9 @@ namespace ContractsTracking.UI.Controllers
             using (var httpClient = new HttpClient())
             {
                 string url = baseURL + "PendingIssue/" + urlExtention;
-                using (var response = await httpClient.GetAsync(url))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    pendingIssues = JsonConvert.DeserializeObject<List<PendingIssue>>(apiResponse);
-                }
+                using var response = await httpClient.GetAsync(url);
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                pendingIssues = JsonConvert.DeserializeObject<List<PendingIssue>>(apiResponse);
             }
             return pendingIssues;
         }
@@ -123,11 +114,9 @@ namespace ContractsTracking.UI.Controllers
             bool isSuccessful = false;
             using (var httpClient = new HttpClient())
             {
-                using (var response = await httpClient.PostAsync(baseURL + "PendingIssue/", issue.getJSON()))
-                {
-                    if (response.IsSuccessStatusCode)
-                        isSuccessful = true;
-                }
+                using var response = await httpClient.PostAsync(baseURL + "PendingIssue/", issue.getJSON());
+                if (response.IsSuccessStatusCode)
+                    isSuccessful = true;
             }
             return isSuccessful;
         }
@@ -137,11 +126,9 @@ namespace ContractsTracking.UI.Controllers
             bool isSuccessful = false;
             using (var httpClient = new HttpClient())
             {
-                using (var response = await httpClient.PostAsync(baseURL + "PendingIssue/update", issue.getJSON()))
-                {
-                    if (response.IsSuccessStatusCode)
-                        isSuccessful = true;
-                }
+                using var response = await httpClient.PostAsync(baseURL + "PendingIssue/update", issue.getJSON());
+                if (response.IsSuccessStatusCode)
+                    isSuccessful = true;
             }
             return isSuccessful;
         }
@@ -150,7 +137,7 @@ namespace ContractsTracking.UI.Controllers
 #region UI Elements
         public IActionResult Index()
         {
-            return View();
+            return View("Index");
         }
 
         public async Task<IActionResult> Dashboard(string username, string password)
@@ -162,8 +149,7 @@ namespace ContractsTracking.UI.Controllers
                 {
                     return RedirectToAction("Index");
                 }
-                List<Contract> contractList = new List<Contract>();
-                contractList = await GetContractData("assignedUser/" + user.username + "/");
+                List<Contract> contractList = await GetContractData("assignedUser/" + user.username + "/");
                 ViewData["user"] = user.username;
                 return View(contractList);
             }
@@ -182,8 +168,8 @@ namespace ContractsTracking.UI.Controllers
             List<Contract> contractList = await GetContractData("contractNumber/" + contractID);
             Contract contract = contractList[0];
             contract.pendingIssues = await GetPendingIssues("contractNumber/" + contractID);
-            data.contract = contract;
-            data.user = user;
+            data.Contract = contract;
+            data.User = user;
             return View(data);
         }
 

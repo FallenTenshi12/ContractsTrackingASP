@@ -13,7 +13,7 @@ namespace ContractsTracking.API.Controllers
     [ApiController]
     public class PendingIssueController : ControllerBase
     {
-        Config config;
+        readonly Config config;
         public PendingIssueController()
         {
             config = new Config();
@@ -55,11 +55,12 @@ namespace ContractsTracking.API.Controllers
         public int Add(PendingIssue issue)
         {
             int rowsAffected = 0;
-            using (SqlConnection conn = new SqlConnection(config.connString))
+            if (!(issue is null))
             {
+                using SqlConnection conn = new SqlConnection(config.connString);
                 conn.Open();
                 string sqlString = "INSERT INTO dbo.PendingIssues (contractNumber, name, assignedGroup, status, timeReported) VALUES " +
-                                        "('"+issue.ContractNumber+"','"+issue.Name+"','"+issue.AssignedGroup+"','"+issue.Status+"','"+issue.TimeReported+"')";
+                                        "('" + issue.ContractNumber + "','" + issue.Name + "','" + issue.AssignedGroup + "','" + issue.Status + "','" + issue.TimeReported + "')";
 
                 SqlCommand cmd = new SqlCommand(sqlString, conn);
                 rowsAffected = cmd.ExecuteNonQuery();
@@ -75,8 +76,9 @@ namespace ContractsTracking.API.Controllers
         public int Update(PendingIssue issue)
         {
             int rowsAffected = 0;
-            using (SqlConnection conn = new SqlConnection(config.connString))
+            if (!(issue is null))
             {
+                using SqlConnection conn = new SqlConnection(config.connString);
                 conn.Open();
                 string sqlString = "UPDATE dbo.PendingIssues " +
                                     "SET status='" + issue.Status + "' " +

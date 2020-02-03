@@ -14,7 +14,7 @@ namespace ContractsTracking.API.Controllers
     [ApiController]
     public class ProblemLabelsController : ControllerBase
     {
-        Config config;
+        readonly Config config;
 
         public ProblemLabelsController()
         {
@@ -36,9 +36,11 @@ namespace ContractsTracking.API.Controllers
 
                 while (reader.Read())
                 {
-                    ProblemLabel problemLabel = new ProblemLabel();
-                    problemLabel.problemName = reader.GetString(0);
-                    problemLabel.defaultGroup = reader.GetString(1);
+                    ProblemLabel problemLabel = new ProblemLabel
+                    {
+                        problemName = reader.GetString(0),
+                        defaultGroup = reader.GetString(1)
+                    };
                     problemLabelList.Add(problemLabel);
                 }
 
@@ -63,9 +65,11 @@ namespace ContractsTracking.API.Controllers
 
                 while (reader.Read())
                 {
-                    ProblemLabel problem = new ProblemLabel();
-                    problem.problemName = reader.GetString(0);
-                    problem.defaultGroup = reader.GetString(1);
+                    ProblemLabel problem = new ProblemLabel
+                    {
+                        problemName = reader.GetString(0),
+                        defaultGroup = reader.GetString(1)
+                    };
                     problemList.Add(problem);
                 }
 
@@ -83,8 +87,9 @@ namespace ContractsTracking.API.Controllers
         public int PostProblem(ProblemLabel problem)
         {
             int rowsAffected = 0;
-            using (SqlConnection conn = new SqlConnection(config.connString))
+            if (!(problem is null))
             {
+                using SqlConnection conn = new SqlConnection(config.connString);
                 conn.Open();
                 string sqlString = "UPDATE dbo.ProblemLabels " +
                                     "SET defaultGroup='" + problem.defaultGroup + "'" +

@@ -10,7 +10,7 @@ using System.Data.Entity;
 
 namespace ContractsTracking.API
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {
